@@ -1,0 +1,13 @@
+
+.login {
+    max-width: 500px;
+}
+
+.recipe-card > img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.new-recipe {
+    max-width: 700px;
+}

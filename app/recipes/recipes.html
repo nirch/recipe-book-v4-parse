@@ -1,0 +1,16 @@
+<recipe-navbar></recipe-navbar>
+<div class="container mt-5">
+    <h1>{{activeUser.fname}}'s Recipes</h1>
+
+    <div class="row">
+        <div class="col-sm-6 col-md-4 my-2" ng-repeat="recipe in recipes">
+            <div class="card recipe-card">
+                <img class="card-img-top" ng-src="{{recipe.imgUrl}}" alt="">
+                <div class="card-body">
+                    <h4 class="card-title">{{recipe.name}}</h4>
+                    <p class="card-text">{{recipe.description}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
