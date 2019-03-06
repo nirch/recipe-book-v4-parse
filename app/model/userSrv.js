@@ -3,11 +3,11 @@ app.factory("userSrv", function ($http, $q, $log) {
 
     var activeUser = null;
 
-    function User(plainUser) {
-        this.id = plainUser.id;
-        this.fname = plainUser.fname;
-        this.lname = plainUser.lname;
-        this.email = plainUser.email;
+    function User(parseUser) {
+        this.id = parseUser.get("id");
+        this.fname = parseUser.get("fname");
+        this.lname = parseUser.get("lname");
+        this.email = parseUser.get("email");
     }
 
     function login(email, pwd) {
@@ -18,7 +18,7 @@ app.factory("userSrv", function ($http, $q, $log) {
         Parse.User.logIn(email, pwd).then(function(user) {
             // Do stuff after successful login
             $log.info('Logged in user', user);
-            activeUser = user;
+            activeUser = new User(user);
             async.resolve(activeUser);
         }).catch(function(error) {
             $log.error('Error while logging in user', error);
