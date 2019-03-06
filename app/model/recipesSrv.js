@@ -1,11 +1,6 @@
 
 app.factory("recipesSrv", function($http, $q, $log, userSrv) {
 
-    // In this object we will save an array of recipes per user id
-    // If a user id doesn't have an entry in this object it means that
-    // the data for this user was never loaded
-    var recipes = {};
-
     function Recipe(parseRecipe) {
         this.id = parseRecipe.get("id");
         this.name = parseRecipe.get("name");
@@ -43,24 +38,31 @@ app.factory("recipesSrv", function($http, $q, $log, userSrv) {
     }
 
 
-    function createRecipe(name, description, imgUrl, ingredients, steps, duration) {
+    function createRecipe(name, description, img, ingredients, steps, duration) {
         var async = $q.defer();
+
+        const RecipeParse = Parse.Object.extend('Recipe');
+        const newRecipe = new RecipeParse();
         
-        var activeUserId = userSrv.getActiveUser().id;
-        var newRecipeId = "3dddd";  // the id should be unique
-        var newRecipeObject = {
-            id: newRecipeId,
-            name: name, 
-            description: description,
-            imgUrl: imgUrl,
-            ingredients: ingredients,
-            steps: steps,
-            duration: duration,
-            userId: activeUserId
-        }
-        var newRecipe = new Recipe(newRecipeObject);
-        recipes[activeUserId].push(newRecipe);
-        async.resolve(newRecipe, recipes[activeUserId]);
+        newRecipe.set('name', name);
+        newRecipe.set('description',description);
+        newRecipe.set('image', new Parse.File(name+".jpg", { base64: img }));
+        newRecipe.set('ingredients', ingredients);
+        newRecipe.set('steps', steps);
+        newRecipe.set('duration', duration);
+        newRecipe.set('userId', Parse.User.current());
+        
+        newRecipe.save().then(
+          function(result) {
+            $log.info('Recipe created', result);
+            var newRecipe = new Recipe(result);
+            async.resolve(newRecipe);
+          },
+          function(error) {
+            $log.error('Error while creating Recipe: ', error);
+            async.reject(error);
+          }
+        );        
 
         return async.promise;
     }
