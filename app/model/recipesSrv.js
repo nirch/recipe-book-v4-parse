@@ -6,40 +6,38 @@ app.factory("recipesSrv", function($http, $q, $log, userSrv) {
     // the data for this user was never loaded
     var recipes = {};
 
-    function Recipe(plainRecipe) {
-        this.id = plainRecipe.id;
-        this.name = plainRecipe.name;
-        this.description = plainRecipe.description;
-        this.imgUrl = plainRecipe.imgUrl;
-        this.ingredients = plainRecipe.ingredients;
-        this.steps = plainRecipe.steps;
-        this.duration = plainRecipe.duration;
-        this.userId = plainRecipe.userId;
+    function Recipe(parseRecipe) {
+        this.id = parseRecipe.get("id");
+        this.name = parseRecipe.get("name");
+        this.description = parseRecipe.get("description");
+        this.imgUrl = parseRecipe.get("image").url();
+        this.ingredients = parseRecipe.get("ingredients");
+        this.steps = parseRecipe.get("steps");
+        this.duration = parseRecipe.get("duration");
+        this.userId = parseRecipe.get("userId");
     }
 
     function getActiveUserRecipes() {
         var async = $q.defer();
         var activeUserId = userSrv.getActiveUser().id;
 
-        // Loading the recipes from JSON only in first time, for the rest of calls returning the array
-        if (recipes[activeUserId]) {
-            async.resolve(recipes[activeUserId]);
-        } else {
-            recipes[activeUserId] = [];
-            // getting all recipes from JSON and then pushing to the array only those that 
-            // were created by the active user
-            $http.get("app/model/data/recipes.json").then(function(res) {
-                var jsonRecipes = res.data;
-                for(var i = 0; i < jsonRecipes.length; i++) {
-                    if (jsonRecipes[i].userId === activeUserId) {
-                        recipes[activeUserId].push(new Recipe(jsonRecipes[i]));
-                    }
-                }
-                async.resolve(recipes[activeUserId]);
-            }, function(err) {
-                async.reject(err);
-            });
-        }
+        var recipes = [];
+
+        const RecipeParse = Parse.Object.extend('Recipe');
+        const query = new Parse.Query(RecipeParse);
+        query.equalTo("userId",  Parse.User.current());
+        query.find().then(function(results) {
+
+          for (var i = 0; i < results.length; i++) {
+            recipes.push(new Recipe(results[i]));
+          }
+
+          async.resolve(recipes);
+
+        }, function(error) {
+            $log.error('Error while fetching Recipe', error);
+            async.reject(error);
+        });
 
         return async.promise;
     }
