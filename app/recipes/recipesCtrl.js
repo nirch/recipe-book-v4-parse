@@ -1,5 +1,5 @@
 
-app.controller("recipesCtrl", function($scope, userSrv, $location, recipesSrv, $log) {
+app.controller("recipesCtrl", function($scope, userSrv, $location, recipesSrv, $log, $interval) {
 
     if (!userSrv.isLoggedIn()) {
         $location.path("/");
@@ -14,5 +14,15 @@ app.controller("recipesCtrl", function($scope, userSrv, $location, recipesSrv, $
     }, function(err) {
         $log.error(err);
     });
+
+
+    $scope.animateIndex = 0;
+    var animationInterval = $interval(function() {
+        ++$scope.animateIndex;
+        console.log($scope.animateIndex);
+        if ($scope.animateIndex > $scope.recipes.length) {
+            $interval.cancel(animationInterval);
+        }
+    }, 3000);
 
 });

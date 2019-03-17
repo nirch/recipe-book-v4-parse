@@ -1,4 +1,14 @@
 
+@keyframes falldown {
+    from {
+        transform: translate(0, -100vh);
+    }
+
+    to {
+        transform: translate(0, 0);
+    }
+}
+
 .login {
     max-width: 500px;
 }
@@ -10,4 +20,14 @@
 
 .new-recipe {
     max-width: 700px;
+}
+
+.recipe-card {
+    /* transform: translate(0, -400px); */
+    display: none;
+}
+
+.recipe-card.animate {
+    display: block;
+    animation: falldown 3s;
 }

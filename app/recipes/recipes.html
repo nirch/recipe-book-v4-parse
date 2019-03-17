@@ -4,7 +4,7 @@
 
     <div class="row">
         <div class="col-sm-6 col-md-4 my-2" ng-repeat="recipe in recipes">
-            <div class="card recipe-card">
+            <div class="card recipe-card" ng-class="{'animate': $index <= animateIndex}">
                 <img class="card-img-top" ng-src="{{recipe.imgUrl}}" alt="">
                 <div class="card-body">
                     <h4 class="card-title">{{recipe.name}}</h4>
